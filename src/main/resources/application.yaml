@@ -5,10 +5,10 @@ telegram:
     maxMessages: ${BOT_MAX_MESSAGES_IN_QUEUE:2}
 
 python:
-  location: ${PYTHON_LOCATION:src/main/resources}
-  file: ${python.location}/main.py
+  location: ${PYTHON_LOCATION:src/main/python}
+  file: ${python.location}/decoder.py
   bucket:
-    location: ${BUCKET_LOCATION:${python.location}/voiceBucket}
+    location: ${BUCKET_LOCATION:src/main/resources/voiceBucket}
 
 logging:
   level:
