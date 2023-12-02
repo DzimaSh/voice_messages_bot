@@ -1,11 +1,11 @@
 #!/bin/sh
 
-if [ "$#" -ne 2 ]; then
-    echo "Usage: ./decoder.sh <arg1> <arg2>"
+if [ "$#" -ne 3 ]; then
+    echo "Usage: ./decode.sh <decoder_file_name> <model_name> <voice_file_path>"
     exit 1
 fi
 
-py ./decoder.py $1 $2
+py $1 $2 $3
 
 exit 0
 

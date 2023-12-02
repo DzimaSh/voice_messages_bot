@@ -22,10 +22,13 @@ import static by.bsu.voicemessages.util.TelegramUtil.voiceToFile;
 @Component
 @Slf4j
 public class MessageHandler implements Handler {
+
+    private final BotProperties botProperties;
     private final BlockingQueue<File> filesToDecode;
     private final MessageConsumer messageConsumer;
 
     public MessageHandler(BotProperties botProperties, DecoderProperties decoderProperties) {
+        this.botProperties = botProperties;
         this.filesToDecode = new LinkedBlockingQueue<>(botProperties.getMaxMessages());
         this.messageConsumer = new MessageConsumer(filesToDecode, botProperties, decoderProperties);
     }
@@ -45,25 +48,27 @@ public class MessageHandler implements Handler {
             throw new UnhandledException(error);
         }
 
-        boolean isAdded = filesToDecode.offer(voiceToFile(sender, message.getVoice()));
+        int length = filesToDecode.size();
         log.debug(String.format(
-                "Voice file is %s. Current queue size is %d%s",
-                isAdded ? "added" : "not added",
-                filesToDecode.size(),
-                isAdded ? "." : ". Queue is full..."
+                "Voice file is going to be added to queue. Current queue size is %d%s",
+                length,
+                botProperties.getMaxMessages().equals(length) ? ". Queue is full..." : "."
         ));
+        boolean isAdded = filesToDecode.offer(voiceToFile(sender, message.getVoice()));
 
         sender.execute(buildMessage(
-                buildResponse(isAdded),
+                buildResponse(isAdded, length),
                 message.getChatId()
         ));
+        log.debug("Answer sent.");
     }
 
-    private String buildResponse(boolean isAddedToQueue) {
+    private String buildResponse(boolean isAddedToQueue, int position) {
         StringBuilder builder = new StringBuilder();
         if (isAddedToQueue) {
             builder.append("Your message is in queue. It's position is: ")
-                    .append(filesToDecode.size());
+                    .append(position)
+                    .append(position == 0 ? "! Processing your request..." : "... Waiting...");
         } else {
             builder.append("Unfortunately, now we cannot proceed your request. ")
                     .append("Try again a bit later!\n")

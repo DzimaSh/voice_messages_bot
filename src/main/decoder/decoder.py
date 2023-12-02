@@ -28,7 +28,7 @@ if __name__ == "__main__":
         result = whisper.decode(model, mel, options)
 
         # print the recognized text
-        print(result.text)
+        print(result.text.encode("utf-8"))
 
     except Exception as e:
         print(f"An error occurred: {e}")
