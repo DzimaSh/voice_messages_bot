@@ -2,3 +2,15 @@ telegram:
   bot:
     token: ${BOT_TOKEN:xxx}
     username: ${BOT_USERNAME:BelVoiceMessagesBot}
+    maxMessages: ${BOT_MAX_MESSAGES_IN_QUEUE:2}
+
+python:
+  location: ${PYTHON_LOCATION:src/main/resources}
+  file: ${python.location}/main.py
+  bucket:
+    location: ${BUCKET_LOCATION:${python.location}/voiceBucket}
+
+logging:
+  level:
+    root: info
+    by.bsu.voicemessages: debug

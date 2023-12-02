@@ -1,4 +1,4 @@
-package by.bsu.voicemessages.util;
+package by.bsu.voicemessages.bot.util;
 
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
@@ -15,4 +15,7 @@ public class BotProperties {
 
     @Value("${telegram.bot.username}")
     private String botUsername;
+
+    @Value("${telegram.bot.maxMessages}")
+    private Integer maxMessages;
 }
