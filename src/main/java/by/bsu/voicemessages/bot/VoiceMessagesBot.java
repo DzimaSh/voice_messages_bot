@@ -34,7 +34,7 @@ public class VoiceMessagesBot extends TelegramLongPollingBot {
             messageHandler.handle(this, update.getMessage());
         } catch (UnhandledException ignored) {
         } catch (TelegramApiException e) {
-            throw new RuntimeException(e);
+            log.error("Voice message is not accessible");
         }
     }
 }
