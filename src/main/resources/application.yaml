@@ -1,0 +1,4 @@
+telegram:
+  bot:
+    token: ${BOT_TOKEN:xxx}
+    username: ${BOT_USERNAME:BelVoiceMessagesBot}
