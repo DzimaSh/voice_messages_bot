@@ -17,7 +17,21 @@ public class TelegramUtil {
         return message;
     }
 
+    public static SendMessage buildReplyMessage(String text, Long chatId, Integer messageId) {
+        SendMessage message = SendMessage.builder()
+                .chatId(chatId)
+                .text(text)
+                .replyToMessageId(messageId)
+                .build();
+        message.enableMarkdown(true);
+        return message;
+    }
+
     public static File voiceToFile(AbsSender sender, Voice voice) throws TelegramApiException {
         return sender.execute(new GetFile(voice.getFileId()));
+    }
+
+    public static VoiceMessageInfo buildVoiceMessageInfo(File file, Integer messageId, Long chatId) {
+        return new VoiceMessageInfo(file, messageId, chatId);
     }
 }

@@ -2,28 +2,35 @@ package by.bsu.voicemessages.decode;
 
 import by.bsu.voicemessages.bot.util.BotProperties;
 import by.bsu.voicemessages.bot.util.DecoderProperties;
+import by.bsu.voicemessages.util.VoiceMessageInfo;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
 import org.telegram.telegrambots.meta.api.objects.File;
+import org.telegram.telegrambots.meta.bots.AbsSender;
+import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
 import java.io.*;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.concurrent.BlockingQueue;
 
+import static by.bsu.voicemessages.util.TelegramUtil.buildReplyMessage;
+
 @Slf4j
 @RequiredArgsConstructor
 public class MessageConsumer implements Runnable {
-    private final BlockingQueue<File> files;
+    private final BlockingQueue<VoiceMessageInfo> files;
     private final BotProperties botProperties;
     private final DecoderProperties decoderProperties;
+    private final AbsSender bot;
 
     @Override
     public void run() {
         while (true) {
             try {
-                File fileToDecode = files.take();;
+                VoiceMessageInfo retrievedPair = files.take();
+                File fileToDecode = retrievedPair.getFile();
                 log.debug("Taking message... " + files.size() + " still waiting.");
 
                 String fileUrl = fileToDecode.getFileUrl(botProperties.getBotToken());
@@ -32,9 +39,14 @@ public class MessageConsumer implements Runnable {
                 saveVoiceFile(fileUrl, fileLocation);
 
                 String decodedMessage = decodeMessage(fileLocation);
-                log.debug(decodedMessage);
-            } catch (InterruptedException | IOException e) {
-                throw new RuntimeException(e);
+                bot.execute(
+                        buildReplyMessage(decodedMessage,
+                                retrievedPair.getChatId(),
+                                retrievedPair.getMessageId()
+                        )
+                );
+            } catch (InterruptedException | IOException | TelegramApiException e) {
+                log.error("Error occurred while handling decoding voice message");
             }
         }
     }
@@ -70,15 +82,14 @@ public class MessageConsumer implements Runnable {
         }
 
         int exitCode = process.waitFor();
-        String exitMessage = "Script executed with exit code: " + exitCode;
         log.debug(
-                exitMessage +
+                "Script executed with exit code: " + exitCode +
                         (exitCode == 0
                                 ? ". Message decoded."
                                 : ". Message is not decoded."
                         )
         );
-        return builder.append(exitMessage).toString();
+        return builder.toString();
     }
 
     @NotNull
