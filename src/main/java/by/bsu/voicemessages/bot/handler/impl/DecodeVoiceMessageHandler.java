@@ -1,5 +1,6 @@
-package by.bsu.voicemessages.bot.handler;
+package by.bsu.voicemessages.bot.handler.impl;
 
+import by.bsu.voicemessages.bot.handler.MessageHandler;
 import by.bsu.voicemessages.bot.util.BotProperties;
 import by.bsu.voicemessages.bot.util.DecoderProperties;
 import by.bsu.voicemessages.decode.MessageConsumer;
@@ -18,7 +19,7 @@ import java.util.concurrent.LinkedBlockingQueue;
 import static by.bsu.voicemessages.util.TelegramUtil.*;
 
 @Slf4j
-public class DecodeVoiceMessageHandler implements Handler {
+public class DecodeVoiceMessageHandler extends MessageHandler {
 
     private final BotProperties botProperties;
     private final AbsSender bot;
@@ -39,7 +40,7 @@ public class DecodeVoiceMessageHandler implements Handler {
     }
 
     @Override
-    public void handle(Message message, ChatMetaInfo chatInfo) throws UnhandledException, TelegramApiException {
+    public void handleMessage(Message message, ChatMetaInfo chatInfo) throws UnhandledException, TelegramApiException {
         log.debug("Message received");
         if (Objects.isNull(message.getVoice())) {
             String error = "Non-voice messages are currently not supported";

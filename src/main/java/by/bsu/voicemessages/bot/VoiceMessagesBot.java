@@ -1,7 +1,7 @@
 package by.bsu.voicemessages.bot;
 
-import by.bsu.voicemessages.bot.handler.CommandHandler;
-import by.bsu.voicemessages.bot.handler.DecodeVoiceMessageHandler;
+import by.bsu.voicemessages.bot.handler.impl.CommandHandler;
+import by.bsu.voicemessages.bot.handler.impl.DecodeVoiceMessageHandler;
 import by.bsu.voicemessages.bot.handler.Handler;
 import by.bsu.voicemessages.bot.util.BotProperties;
 import by.bsu.voicemessages.bot.util.DecoderProperties;
@@ -10,9 +10,11 @@ import by.bsu.voicemessages.exception.UnhandledException;
 import by.bsu.voicemessages.util.ChatMetaInfo;
 import by.bsu.voicemessages.util.TelegramUtil;
 import jakarta.annotation.PostConstruct;
+import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
+import org.telegram.telegrambots.meta.api.objects.CallbackQuery;
 import org.telegram.telegrambots.meta.api.objects.Message;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
@@ -60,34 +62,44 @@ public class VoiceMessagesBot extends TelegramLongPollingBot {
         log.debug("Update received");
 
         try {
-            Long chatId = update.getMessage().getChatId();
-            try {
-                Message message = update.getMessage();
-                ChatMetaInfo chatInfoToPut = new ChatMetaInfo(message.getChatId());
-                ChatMetaInfo chatInfo = Optional
-                        .ofNullable(chatsInfo
-                                .putIfAbsent(chatId, chatInfoToPut)
-                        )
-                        .orElse(chatInfoToPut);
-
-                String action = retrieveActionFromMessage(message);
-
-                if (Objects.isNull(action)) {
-                    this.execute(TelegramUtil
-                            .buildMessage("Unsupported request! Try /help for further info", chatInfo.getChatId()));
-                } else {
-                    handlerList.get(action).handle(message, chatInfo);
-                    log.debug("Update handled");
-                }
-            } catch (UnhandledCommandException e) {
-                this.execute(TelegramUtil
-                        .buildMessage("Unsupported command! Try /help for further info", chatId));
-            } catch (UnhandledException e) {
-                log.error("Unhandled type of message received");
+            if (Objects.nonNull(update.getMessage())) {
+                handleReceivedMessage(update.getMessage());
+            } else if (Objects.nonNull(update.getCallbackQuery())) {
+                handleReceivedCallbackQuery(update.getCallbackQuery());
             }
-
         } catch (TelegramApiException e) {
             log.error("Telegram Api Error: " + e.getMessage());
+        }
+    }
+
+    private void handleReceivedCallbackQuery(@NonNull CallbackQuery callbackQuery) {
+
+    }
+
+    private void handleReceivedMessage(@NonNull Message message) throws TelegramApiException {
+        Long chatId = message.getChatId();
+        try {
+            ChatMetaInfo chatInfoToPut = new ChatMetaInfo(message.getChatId());
+            ChatMetaInfo chatInfo = Optional
+                    .ofNullable(chatsInfo
+                            .putIfAbsent(chatId, chatInfoToPut)
+                    )
+                    .orElse(chatInfoToPut);
+
+            String action = retrieveActionFromMessage(message);
+
+            if (Objects.isNull(action)) {
+                this.execute(TelegramUtil
+                        .buildMessage("Unsupported request! Try /help for further info", chatInfo.getChatId()));
+            } else {
+                handlerList.get(action).handle(message, chatInfo);
+                log.debug("Update handled");
+            }
+        } catch (UnhandledCommandException e) {
+            this.execute(TelegramUtil
+                    .buildMessage("Unsupported command! Try /help for further info", chatId));
+        } catch (UnhandledException e) {
+            log.error("Unhandled type of message received");
         }
     }
 

@@ -1,8 +1,9 @@
-package by.bsu.voicemessages.bot.handler;
+package by.bsu.voicemessages.bot.handler.impl;
 
 import by.bsu.voicemessages.bot.command.Command;
 import by.bsu.voicemessages.bot.command.CommandDetails;
 import by.bsu.voicemessages.bot.command.impl.SetLangCommand;
+import by.bsu.voicemessages.bot.handler.MessageHandler;
 import by.bsu.voicemessages.exception.UnhandledCommandException;
 import by.bsu.voicemessages.exception.UnhandledException;
 import by.bsu.voicemessages.util.ChatMetaInfo;
@@ -18,7 +19,7 @@ import java.util.Objects;
 import static by.bsu.voicemessages.bot.command.CommandDetails.SET_LANG;
 
 @Slf4j
-public class CommandHandler implements Handler {
+public class CommandHandler extends MessageHandler {
 
     private final AbsSender bot;
     private final HashMap<CommandDetails, Command> commands = new HashMap<>();
@@ -29,7 +30,7 @@ public class CommandHandler implements Handler {
     }
 
     @Override
-    public void handle(Message message, ChatMetaInfo chatInfo) throws UnhandledException, TelegramApiException {
+    public void handleMessage(Message message, ChatMetaInfo chatInfo) throws UnhandledException, TelegramApiException {
         CommandDetails command = retrieveCommandFromMessage(message);
 
         if (Objects.isNull(command)) {

@@ -19,6 +19,11 @@ import java.util.List;
 @Slf4j
 public class TelegramUtil {
 
+    public static void sendMessage(AbsSender sender, SendMessage message) throws TelegramApiException {
+        sender.execute(message);
+        log.info("Answer sent to user");
+    }
+
     public static SendMessage buildMessage(String text, Long chatId) {
         SendMessage message = SendMessage.builder()
                 .chatId(chatId)
