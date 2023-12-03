@@ -1,0 +1,14 @@
+version: '3.6'
+
+services:
+  bot:
+    container_name: bot.local
+    build:
+      dockerfile: docker/bot/Dockerfile
+    image: voice-messages-bot:latest
+    env_file:
+      - env/bot.env
+    volumes:
+      - .:/source
+    ports:
+      - '8080:8080'

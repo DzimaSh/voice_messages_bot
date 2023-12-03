@@ -99,10 +99,10 @@ public class MessageConsumer implements Runnable {
     @NotNull
     private Process buildDecodeProcess() throws IOException {
         ProcessBuilder processBuilder = new ProcessBuilder(
-                "D:/Java/JavaProjects/voicemessages/src/main/decoder/decode.bat",
-                "D:/Java/JavaProjects/voicemessages/src/main/decoder/decoder.py",
+                "/source/src/main/decoder/decode.sh",
+                "/source/src/main/decoder/decoder.py",
                 decoderProperties.getDecoderModel(),
-                "D:/Java/JavaProjects/voicemessages/src/main/decoder/voiceBucket/voice.mp3"
+                "/source/src/main/decoder/voiceBucket/voice.mp3"
         );
         processBuilder.redirectErrorStream(true);
 
