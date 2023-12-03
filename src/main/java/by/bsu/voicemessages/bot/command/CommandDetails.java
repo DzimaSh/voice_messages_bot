@@ -6,7 +6,8 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 @Getter
 public enum CommandDetails {
-    SET_LANG("/lang", "Set default language to decode messages");
+    SET_LANG("/lang", "Set default language to decode messages"),
+    HELP("/help", "Get help info");
 
     private final String commandIdentifier;
     private final String commandDescription;

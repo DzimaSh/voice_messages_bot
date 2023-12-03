@@ -2,6 +2,7 @@ package by.bsu.voicemessages.bot.handler.impl;
 
 import by.bsu.voicemessages.bot.command.Command;
 import by.bsu.voicemessages.bot.command.CommandDetails;
+import by.bsu.voicemessages.bot.command.impl.HelpCommand;
 import by.bsu.voicemessages.bot.command.impl.SetLangCommand;
 import by.bsu.voicemessages.bot.handler.MessageHandler;
 import by.bsu.voicemessages.exception.UnhandledCommandException;
@@ -16,6 +17,7 @@ import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 import java.util.HashMap;
 import java.util.Objects;
 
+import static by.bsu.voicemessages.bot.command.CommandDetails.HELP;
 import static by.bsu.voicemessages.bot.command.CommandDetails.SET_LANG;
 
 @Slf4j
@@ -43,6 +45,9 @@ public class CommandHandler extends MessageHandler {
     public void initializeCommands() {
         commands.put(SET_LANG, new SetLangCommand(
                 bot, SET_LANG.getCommandIdentifier(), SET_LANG.getCommandDescription())
+        );
+        commands.put(HELP, new HelpCommand(
+                bot, HELP.getCommandIdentifier(), HELP.getCommandDescription())
         );
 
         log.info("Command handler initialized");
