@@ -4,6 +4,7 @@ import by.bsu.voicemessages.bot.util.BotProperties;
 import by.bsu.voicemessages.bot.util.DecoderProperties;
 import by.bsu.voicemessages.decode.MessageConsumer;
 import by.bsu.voicemessages.exception.UnhandledException;
+import by.bsu.voicemessages.util.ChatMetaInfo;
 import by.bsu.voicemessages.util.VoiceMessageInfo;
 import lombok.extern.slf4j.Slf4j;
 import org.telegram.telegrambots.meta.api.objects.Message;
@@ -17,14 +18,14 @@ import java.util.concurrent.LinkedBlockingQueue;
 import static by.bsu.voicemessages.util.TelegramUtil.*;
 
 @Slf4j
-public class MessageHandler implements Handler {
+public class DecodeVoiceMessageHandler implements Handler {
 
     private final BotProperties botProperties;
     private final AbsSender bot;
     private final BlockingQueue<VoiceMessageInfo> filesToDecode;
     private final MessageConsumer messageConsumer;
 
-    public MessageHandler(BotProperties botProperties, DecoderProperties decoderProperties, AbsSender bot) {
+    public DecodeVoiceMessageHandler(BotProperties botProperties, DecoderProperties decoderProperties, AbsSender bot) {
         this.botProperties = botProperties;
         this.bot = bot;
         this.filesToDecode = new LinkedBlockingQueue<>(botProperties.getMaxMessages());
@@ -38,7 +39,7 @@ public class MessageHandler implements Handler {
     }
 
     @Override
-    public void handle(Message message) throws UnhandledException, TelegramApiException {
+    public void handle(Message message, ChatMetaInfo chatInfo) throws UnhandledException, TelegramApiException {
         log.debug("Message received");
         if (Objects.isNull(message.getVoice())) {
             String error = "Non-voice messages are currently not supported";
@@ -55,7 +56,8 @@ public class MessageHandler implements Handler {
         boolean isAdded = filesToDecode.offer(
                 buildVoiceMessageInfo(voiceToFile(bot, message.getVoice()),
                         message.getMessageId(),
-                        message.getChatId())
+                        message.getChatId(),
+                        chatInfo.getLanguage())
         );
 
         bot.execute(buildMessage(

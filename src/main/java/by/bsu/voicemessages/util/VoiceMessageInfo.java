@@ -1,5 +1,6 @@
 package by.bsu.voicemessages.util;
 
+import by.bsu.voicemessages.decode.Language;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.telegram.telegrambots.meta.api.objects.File;
@@ -14,4 +15,5 @@ public class VoiceMessageInfo {
     private final File file;
     private final int messageId;
     private final long chatId;
+    private final Language lang;
 }

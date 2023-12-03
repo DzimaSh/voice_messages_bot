@@ -1,5 +1,7 @@
 package by.bsu.voicemessages.util;
 
+import by.bsu.voicemessages.bot.command.CommandDetails;
+import by.bsu.voicemessages.decode.Language;
 import lombok.extern.slf4j.Slf4j;
 import org.telegram.telegrambots.meta.api.methods.GetFile;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
@@ -9,6 +11,9 @@ import org.telegram.telegrambots.meta.bots.AbsSender;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
 import java.nio.charset.StandardCharsets;
+import java.util.Locale;
+
+import static by.bsu.voicemessages.bot.util.BotActionConstants.COMMAND_PREFIX;
 
 @Slf4j
 public class TelegramUtil {
@@ -35,8 +40,18 @@ public class TelegramUtil {
         return sender.execute(new GetFile(voice.getFileId()));
     }
 
-    public static VoiceMessageInfo buildVoiceMessageInfo(File file, Integer messageId, Long chatId) {
-        return new VoiceMessageInfo(file, messageId, chatId);
+    public static VoiceMessageInfo buildVoiceMessageInfo(File file, Integer messageId, Long chatId, Language lang) {
+        return new VoiceMessageInfo(file, messageId, chatId, lang);
+    }
+
+    public static CommandDetails getCommandByIdentifier(String identifier) {
+        String[] options = identifier.split(" ");
+        if (options.length > 0) {
+            return CommandDetails.valueOf(options[0]
+                    .toUpperCase(Locale.ROOT)
+                    .replace(COMMAND_PREFIX, ""));
+        }
+        return null;
     }
 
     public static String decodeUTF8(String encodedString) {

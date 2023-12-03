@@ -15,6 +15,7 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.nio.charset.StandardCharsets;
 import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import static by.bsu.voicemessages.util.TelegramUtil.buildReplyMessage;
 import static by.bsu.voicemessages.util.TelegramUtil.decodeUnicodeString;
@@ -27,18 +28,24 @@ public class MessageConsumer implements Runnable {
     private final DecoderProperties decoderProperties;
     private final AbsSender bot;
 
+    private final AtomicBoolean isWritingAudio = new AtomicBoolean(false);
+
     @Override
     public void run() {
         while (true) {
+            if (isWritingAudio.get()) continue;
             try {
                 VoiceMessageInfo retrievedPair = files.take();
                 File fileToDecode = retrievedPair.getFile();
+
+                isWritingAudio.compareAndSet(false, true);
                 log.debug("Taking message... " + files.size() + " still waiting.");
 
                 String fileUrl = fileToDecode.getFileUrl(botProperties.getBotToken());
                 String voiceFfileLocation = prepareVoiceFileLocation();
 
                 saveVoiceFile(fileUrl, voiceFfileLocation);
+                isWritingAudio.compareAndSet(true, false);
 
                 String decodedMessage = decodeMessage(voiceFfileLocation);
                 bot.execute(
