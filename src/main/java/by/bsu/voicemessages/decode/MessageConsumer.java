@@ -100,7 +100,9 @@ public class MessageConsumer implements Runnable {
                                 : ". Message is not decoded."
                         )
         );
-        return builder.toString();
+        return builder.append('\n')
+                .append(String.format("Created with @%s", botProperties.getBotUsername()))
+                .toString();
     }
 
     @NotNull

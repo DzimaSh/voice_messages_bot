@@ -23,12 +23,12 @@ public class TelegramUtil {
 
     public static void updateMessage(AbsSender sender, EditMessageText editedMessage) throws TelegramApiException {
         sender.execute(editedMessage);
-        log.info(ANSWER_SENT);
+        log.debug(ANSWER_SENT);
     }
 
     public static void sendMessage(AbsSender sender, SendMessage message) throws TelegramApiException {
         sender.execute(message);
-        log.info(ANSWER_SENT);
+        log.debug(ANSWER_SENT);
     }
 
     public static EditMessageText buildEditMessage(String newText, Integer messageId, Long chatId) {

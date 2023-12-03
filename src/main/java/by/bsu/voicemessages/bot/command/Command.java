@@ -1,6 +1,7 @@
 package by.bsu.voicemessages.bot.command;
 
 import by.bsu.voicemessages.util.ChatMetaInfo;
+import by.bsu.voicemessages.util.TelegramUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.commands.BotCommand;
@@ -18,8 +19,7 @@ public abstract class Command extends BotCommand {
     }
 
     protected void sendAnswer(SendMessage answer) throws TelegramApiException {
-        bot.execute(answer);
-        log.info("Answer sent to user");
+        TelegramUtil.sendMessage(bot, answer);
     }
 
     public abstract void execute(ChatMetaInfo chatMetaInfo) throws TelegramApiException;

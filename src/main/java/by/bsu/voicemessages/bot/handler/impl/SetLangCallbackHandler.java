@@ -30,7 +30,7 @@ public class SetLangCallbackHandler extends CallbackHandler {
 
             updateMessage(
                     EmojiParser.parseToUnicode(
-                            String.format("Language is successfully changed to %s :white_check_mark:", newLang.getDescription())
+                            String.format("Language is changed to %s :white_check_mark:", newLang.getDescription())
                     ),
                     callbackQuery.getMessage()
             );

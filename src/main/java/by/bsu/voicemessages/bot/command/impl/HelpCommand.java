@@ -13,7 +13,7 @@ import static by.bsu.voicemessages.util.TelegramUtil.buildMessage;
 public class HelpCommand extends Command {
 
     private final String helpMessage = """
-            :microphone: Welcome to VoiceBot Help! :notes:
+            :microphone: Welcome to @BelVoiceMessagesBot! :notes:
                         
             Use the VoiceBot by sending voice messages directly to the chat. Our system will recognize the speech in your messages and transcribe it for you.
             

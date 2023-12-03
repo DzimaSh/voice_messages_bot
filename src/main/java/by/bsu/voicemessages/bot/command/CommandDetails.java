@@ -6,6 +6,7 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 @Getter
 public enum CommandDetails {
+    START("/start", "Start the bot"),
     SET_LANG("/lang", "Set default language to decode messages"),
     HELP("/help", "Get help info");
 

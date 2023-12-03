@@ -17,8 +17,7 @@ import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 import java.util.HashMap;
 import java.util.Objects;
 
-import static by.bsu.voicemessages.bot.command.CommandDetails.HELP;
-import static by.bsu.voicemessages.bot.command.CommandDetails.SET_LANG;
+import static by.bsu.voicemessages.bot.command.CommandDetails.*;
 
 @Slf4j
 public class CommandHandler extends MessageHandler {
@@ -43,12 +42,12 @@ public class CommandHandler extends MessageHandler {
     }
 
     public void initializeCommands() {
+        HelpCommand helpCommand = new HelpCommand(bot, HELP.getCommandIdentifier(), HELP.getCommandDescription());
         commands.put(SET_LANG, new SetLangCommand(
-                bot, SET_LANG.getCommandIdentifier(), SET_LANG.getCommandDescription())
-        );
-        commands.put(HELP, new HelpCommand(
-                bot, HELP.getCommandIdentifier(), HELP.getCommandDescription())
-        );
+                bot, SET_LANG.getCommandIdentifier(), SET_LANG.getCommandDescription()
+        ));
+        commands.put(HELP, helpCommand);
+        commands.put(START, helpCommand);
 
         log.info("Command handler initialized");
         log.info("Available commands list: " + commands.keySet()
