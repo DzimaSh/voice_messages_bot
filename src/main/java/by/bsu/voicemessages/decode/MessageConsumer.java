@@ -109,7 +109,8 @@ public class MessageConsumer implements Runnable {
                 decoderProperties.getDecodeScript(),
                 decoderProperties.getDecoderFile(),
                 decoderProperties.getDecoderModel(),
-                voiceFileLocation
+                voiceFileLocation,
+                "--encode"
         );
         processBuilder.redirectErrorStream(true);
 

@@ -7,12 +7,9 @@ import by.bsu.voicemessages.exception.UnhandledCommandException;
 import by.bsu.voicemessages.exception.UnhandledException;
 import by.bsu.voicemessages.util.ChatMetaInfo;
 import by.bsu.voicemessages.util.TelegramUtil;
-import jakarta.annotation.PostConstruct;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.telegram.telegrambots.meta.api.objects.Message;
 import org.telegram.telegrambots.meta.bots.AbsSender;
-import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
 import java.util.HashMap;
 import java.util.Objects;
@@ -20,14 +17,18 @@ import java.util.Objects;
 import static by.bsu.voicemessages.bot.command.CommandDetails.SET_LANG;
 
 @Slf4j
-@RequiredArgsConstructor
 public class CommandHandler implements Handler {
 
     private final AbsSender bot;
     private final HashMap<CommandDetails, Command> commands = new HashMap<>();
 
+    public CommandHandler(AbsSender bot) {
+        this.bot = bot;
+        initializeCommands();
+    }
+
     @Override
-    public void handle(Message message, ChatMetaInfo chatInfo) throws UnhandledException, TelegramApiException {
+    public void handle(Message message, ChatMetaInfo chatInfo) throws UnhandledException {
         CommandDetails command = retrieveCommandFromMessage(message);
 
         if (Objects.isNull(command)) {
@@ -37,7 +38,6 @@ public class CommandHandler implements Handler {
         commands.get(command).execute(chatInfo);
     }
 
-    @PostConstruct
     public void initializeCommands() {
         commands.put(SET_LANG, new SetLangCommand(
                 bot, SET_LANG.getCommandIdentifier(), SET_LANG.getCommandDescription())

@@ -10,4 +10,13 @@ public enum CommandDetails {
 
     private final String commandIdentifier;
     private final String commandDescription;
+
+    public static CommandDetails fromString(String commandIdentifier) {
+        for (CommandDetails cmd : CommandDetails.values()) {
+            if (cmd.commandIdentifier.equalsIgnoreCase(commandIdentifier)) {
+                return cmd;
+            }
+        }
+        throw new IllegalArgumentException("No constant with commandIdentifier " + commandIdentifier + " found");
+    }
 }

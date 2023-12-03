@@ -11,9 +11,6 @@ import org.telegram.telegrambots.meta.bots.AbsSender;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
 import java.nio.charset.StandardCharsets;
-import java.util.Locale;
-
-import static by.bsu.voicemessages.bot.util.BotActionConstants.COMMAND_PREFIX;
 
 @Slf4j
 public class TelegramUtil {
@@ -47,9 +44,7 @@ public class TelegramUtil {
     public static CommandDetails getCommandByIdentifier(String identifier) {
         String[] options = identifier.split(" ");
         if (options.length > 0) {
-            return CommandDetails.valueOf(options[0]
-                    .toUpperCase(Locale.ROOT)
-                    .replace(COMMAND_PREFIX, ""));
+            return CommandDetails.fromString(options[0]);
         }
         return null;
     }
