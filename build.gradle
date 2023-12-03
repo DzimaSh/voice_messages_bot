@@ -23,6 +23,7 @@ dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter:3.0.12'
 	implementation 'org.telegram:telegrambots-spring-boot-starter:6.7.0'
 	implementation 'org.telegram:telegrambots-abilities:6.7.0'
+	implementation 'com.vdurmont:emoji-java:5.1.1'
 
 	compileOnly 'org.projectlombok:lombok:1.18.30'
 	annotationProcessor 'org.projectlombok:lombok:1.18.30'

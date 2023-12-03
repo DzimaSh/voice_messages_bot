@@ -10,6 +10,7 @@ import by.bsu.voicemessages.util.TelegramUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.telegram.telegrambots.meta.api.objects.Message;
 import org.telegram.telegrambots.meta.bots.AbsSender;
+import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
 import java.util.HashMap;
 import java.util.Objects;
@@ -28,7 +29,7 @@ public class CommandHandler implements Handler {
     }
 
     @Override
-    public void handle(Message message, ChatMetaInfo chatInfo) throws UnhandledException {
+    public void handle(Message message, ChatMetaInfo chatInfo) throws UnhandledException, TelegramApiException {
         CommandDetails command = retrieveCommandFromMessage(message);
 
         if (Objects.isNull(command)) {

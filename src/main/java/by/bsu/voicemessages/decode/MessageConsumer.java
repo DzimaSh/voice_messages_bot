@@ -56,7 +56,6 @@ public class MessageConsumer implements Runnable {
                 );
             } catch (InterruptedException | IOException | TelegramApiException e) {
                 log.error("Error occurred while handling decoding voice message");
-                e.printStackTrace();
             }
         }
     }

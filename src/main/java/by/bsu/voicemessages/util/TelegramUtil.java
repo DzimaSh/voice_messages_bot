@@ -2,18 +2,23 @@ package by.bsu.voicemessages.util;
 
 import by.bsu.voicemessages.bot.command.CommandDetails;
 import by.bsu.voicemessages.decode.Language;
+import com.vdurmont.emoji.EmojiParser;
 import lombok.extern.slf4j.Slf4j;
 import org.telegram.telegrambots.meta.api.methods.GetFile;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.File;
 import org.telegram.telegrambots.meta.api.objects.Voice;
+import org.telegram.telegrambots.meta.api.objects.replykeyboard.ReplyKeyboard;
+import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKeyboardButton;
 import org.telegram.telegrambots.meta.bots.AbsSender;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
 import java.nio.charset.StandardCharsets;
+import java.util.List;
 
 @Slf4j
 public class TelegramUtil {
+
     public static SendMessage buildMessage(String text, Long chatId) {
         SendMessage message = SendMessage.builder()
                 .chatId(chatId)
@@ -24,12 +29,14 @@ public class TelegramUtil {
     }
 
     public static SendMessage buildReplyMessage(String text, Long chatId, Integer messageId) {
-        SendMessage message = SendMessage.builder()
-                .chatId(chatId)
-                .text(text)
-                .replyToMessageId(messageId)
-                .build();
-        message.enableMarkdown(true);
+        SendMessage message = buildMessage(text, chatId);
+        message.setReplyToMessageId(messageId);
+        return message;
+    }
+
+    public static SendMessage buildReplyMarkupMessage(String text, Long chatId, ReplyKeyboard markup) {
+        SendMessage message = buildMessage(text, chatId);
+        message.setReplyMarkup(markup);
         return message;
     }
 
@@ -86,5 +93,21 @@ public class TelegramUtil {
         }
 
         return decodedString.toString();
+    }
+
+    @SafeVarargs
+    public static List<List<InlineKeyboardButton>> buildKeyboard(List<InlineKeyboardButton>... rows) {
+        return List.of(rows);
+    }
+
+    public static List<InlineKeyboardButton> buildKeyboardRow(InlineKeyboardButton... buttons) {
+        return List.of(buttons);
+    }
+
+    public static InlineKeyboardButton buildKeyboardButton(String buttonText, String callbackData) {
+        return InlineKeyboardButton.builder()
+                .text(EmojiParser.parseToUnicode(buttonText))
+                .callbackData(callbackData)
+                .build();
     }
 }
