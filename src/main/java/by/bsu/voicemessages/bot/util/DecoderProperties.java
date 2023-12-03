@@ -14,6 +14,9 @@ public class DecoderProperties {
     @Value("${decoder.model}")
     private String decoderModel;
 
+    @Value("${decoder.script}")
+    private String decodeScript;
+
     @Value("${decoder.file}")
     private String decoderFile;
 

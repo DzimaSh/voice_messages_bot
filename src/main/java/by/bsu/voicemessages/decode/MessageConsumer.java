@@ -36,11 +36,11 @@ public class MessageConsumer implements Runnable {
                 log.debug("Taking message... " + files.size() + " still waiting.");
 
                 String fileUrl = fileToDecode.getFileUrl(botProperties.getBotToken());
-                String fileLocation = prepareFileLocation();
+                String voiceFfileLocation = prepareVoiceFileLocation();
 
-                saveVoiceFile(fileUrl, fileLocation);
+                saveVoiceFile(fileUrl, voiceFfileLocation);
 
-                String decodedMessage = decodeMessage(fileLocation);
+                String decodedMessage = decodeMessage(voiceFfileLocation);
                 bot.execute(
                         buildReplyMessage(decodedMessage,
                                 retrievedPair.getChatId(),
@@ -53,7 +53,7 @@ public class MessageConsumer implements Runnable {
         }
     }
 
-    private String prepareFileLocation() {
+    private String prepareVoiceFileLocation() {
         return decoderProperties.getBucketLocation() + "/voice.mp3";
     }
 
@@ -73,8 +73,8 @@ public class MessageConsumer implements Runnable {
         }
     }
 
-    private String decodeMessage(String fileLocation) throws IOException, InterruptedException {
-        Process process = buildDecodeProcess();
+    private String decodeMessage(String voiceFileLocation) throws IOException, InterruptedException {
+        Process process = buildDecodeProcess(voiceFileLocation);
         BufferedReader reader = new BufferedReader(
                 new InputStreamReader(process.getInputStream(), StandardCharsets.UTF_8)
         );
@@ -97,12 +97,12 @@ public class MessageConsumer implements Runnable {
     }
 
     @NotNull
-    private Process buildDecodeProcess() throws IOException {
+    private Process buildDecodeProcess(String voiceFileLocation) throws IOException {
         ProcessBuilder processBuilder = new ProcessBuilder(
-                "/source/src/main/decoder/decode.sh",
-                "/source/src/main/decoder/decoder.py",
+                decoderProperties.getDecodeScript(),
+                decoderProperties.getDecoderFile(),
                 decoderProperties.getDecoderModel(),
-                "/source/src/main/decoder/voiceBucket/voice.mp3"
+                voiceFileLocation
         );
         processBuilder.redirectErrorStream(true);
 

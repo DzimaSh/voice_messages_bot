@@ -8,7 +8,8 @@ decoder:
   location: ${DECODER_LOCATION:src/main/decoder}
   executor: ${DECODER_EXECUTOR:bin/bash}
   model: ${DECODER_MODEL:base}
-  file: ${decoder.location}/${DECODE_FILE:decode.sh}
+  script: ${decoder.location}/${DECODE_SCRIPT_FILE:decode.sh}
+  file: ${decoder.location}/${DECODER_FILE:decoder.py}
   bucket:
     location: ${BUCKET_LOCATION:${decoder.location}/voiceBucket}
 
