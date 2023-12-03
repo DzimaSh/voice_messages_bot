@@ -5,7 +5,6 @@ import by.bsu.voicemessages.bot.util.DecoderProperties;
 import by.bsu.voicemessages.decode.MessageConsumer;
 import by.bsu.voicemessages.exception.UnhandledException;
 import by.bsu.voicemessages.util.VoiceMessageInfo;
-import jakarta.annotation.PostConstruct;
 import lombok.extern.slf4j.Slf4j;
 import org.telegram.telegrambots.meta.api.objects.Message;
 import org.telegram.telegrambots.meta.bots.AbsSender;
@@ -30,9 +29,9 @@ public class MessageHandler implements Handler {
         this.bot = bot;
         this.filesToDecode = new LinkedBlockingQueue<>(botProperties.getMaxMessages());
         this.messageConsumer = new MessageConsumer(filesToDecode, botProperties, decoderProperties, bot);
+        initMessageConsumer();
     }
 
-    @PostConstruct
     public void initMessageConsumer() {
         new Thread(messageConsumer).start();
         log.info("Consumer started...");

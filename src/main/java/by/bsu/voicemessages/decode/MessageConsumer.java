@@ -13,9 +13,11 @@ import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 import java.io.*;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.nio.charset.StandardCharsets;
 import java.util.concurrent.BlockingQueue;
 
 import static by.bsu.voicemessages.util.TelegramUtil.buildReplyMessage;
+import static by.bsu.voicemessages.util.TelegramUtil.decodeUnicodeString;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -73,12 +75,14 @@ public class MessageConsumer implements Runnable {
 
     private String decodeMessage(String fileLocation) throws IOException, InterruptedException {
         Process process = buildDecodeProcess();
-        BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
+        BufferedReader reader = new BufferedReader(
+                new InputStreamReader(process.getInputStream(), StandardCharsets.UTF_8)
+        );
 
         StringBuilder builder = new StringBuilder();
-        String line;
-        while ((line = reader.readLine()) != null) {
-            builder.append(line).append('\n');
+        String utf8encoded;
+        while ((utf8encoded = reader.readLine()) != null) {
+            builder.append(decodeUnicodeString(utf8encoded)).append('\n');
         }
 
         int exitCode = process.waitFor();

@@ -15,4 +15,4 @@ decoder:
 logging:
   level:
     root: info
-    by.bsu.voicemessages: debug
+    by.bsu.voicemessages: info
