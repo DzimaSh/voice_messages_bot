@@ -1,10 +1,14 @@
 package by.bsu.voicemessages.bot;
 
+import by.bsu.voicemessages.bot.handler.CallbackHandler;
+import by.bsu.voicemessages.bot.handler.MessageHandler;
 import by.bsu.voicemessages.bot.handler.impl.CommandHandler;
 import by.bsu.voicemessages.bot.handler.impl.DecodeVoiceMessageHandler;
 import by.bsu.voicemessages.bot.handler.Handler;
+import by.bsu.voicemessages.bot.handler.impl.SetLangCallbackHandler;
 import by.bsu.voicemessages.bot.util.BotProperties;
 import by.bsu.voicemessages.bot.util.DecoderProperties;
+import by.bsu.voicemessages.exception.UnhandledCallbackException;
 import by.bsu.voicemessages.exception.UnhandledCommandException;
 import by.bsu.voicemessages.exception.UnhandledException;
 import by.bsu.voicemessages.util.ChatMetaInfo;
@@ -48,6 +52,7 @@ public class VoiceMessagesBot extends TelegramLongPollingBot {
                 botProperties, decoderProperties, this)
         );
         handlerList.put(COMMAND_KEY, new CommandHandler(this));
+        handlerList.put(SET_LANG_CALLBACK_KEY, new SetLangCallbackHandler(this));
 
         log.info("Handlers initialized");
     }
@@ -67,50 +72,59 @@ public class VoiceMessagesBot extends TelegramLongPollingBot {
             } else if (Objects.nonNull(update.getCallbackQuery())) {
                 handleReceivedCallbackQuery(update.getCallbackQuery());
             }
+        } catch (UnhandledException e) {
+            log.error("Unhandled object received: " + e.getMessage());
         } catch (TelegramApiException e) {
             log.error("Telegram Api Error: " + e.getMessage());
         }
+
+        log.debug("Update handled");
     }
 
-    private void handleReceivedCallbackQuery(@NonNull CallbackQuery callbackQuery) {
+    private void handleReceivedCallbackQuery(@NonNull CallbackQuery callbackQuery) throws TelegramApiException {
+        Long chatId = retrieveChatId(callbackQuery.getMessage());
 
+        try {
+            ChatMetaInfo chatInfo = putOrGetChatMetaInfoIfAbsent(chatId);
+
+            String action = Objects.requireNonNull(
+                    CallbackHandler.retrieveCallbackActionFromCallbackQuery(callbackQuery)
+            );
+
+            handlerList.get(action).handle(callbackQuery, chatInfo);
+        } catch (UnhandledCallbackException e) {
+            log.error("Unhandled type of callback received: " + e.getMessage());
+            this.execute(TelegramUtil
+                    .buildMessage(e.getMessage(), chatId));
+        }
     }
 
     private void handleReceivedMessage(@NonNull Message message) throws TelegramApiException {
-        Long chatId = message.getChatId();
+        Long chatId = retrieveChatId(message);
         try {
-            ChatMetaInfo chatInfoToPut = new ChatMetaInfo(message.getChatId());
-            ChatMetaInfo chatInfo = Optional
-                    .ofNullable(chatsInfo
-                            .putIfAbsent(chatId, chatInfoToPut)
-                    )
-                    .orElse(chatInfoToPut);
+            ChatMetaInfo chatInfo = putOrGetChatMetaInfoIfAbsent(chatId);
 
-            String action = retrieveActionFromMessage(message);
+            String action = Objects.requireNonNull(
+                    MessageHandler.retrieveActionFromMessage(message)
+            );
 
-            if (Objects.isNull(action)) {
-                this.execute(TelegramUtil
-                        .buildMessage("Unsupported request! Try /help for further info", chatInfo.getChatId()));
-            } else {
-                handlerList.get(action).handle(message, chatInfo);
-                log.debug("Update handled");
-            }
+            handlerList.get(action).handle(message, chatInfo);
         } catch (UnhandledCommandException e) {
             this.execute(TelegramUtil
                     .buildMessage("Unsupported command! Try /help for further info", chatId));
-        } catch (UnhandledException e) {
-            log.error("Unhandled type of message received");
         }
     }
 
-    private String retrieveActionFromMessage(Message message) throws TelegramApiException {
-        if (Objects.nonNull(message.getText())) {
-            if (message.getText().startsWith(COMMAND_PREFIX)) {
-                return COMMAND_KEY;
-            }
-        } else if (Objects.nonNull(message.getVoice())) {
-            return DECODE_VOICE_MESSAGE_KEY;
-        }
-        return null;
+    private ChatMetaInfo putOrGetChatMetaInfoIfAbsent(Long chatId) {
+        ChatMetaInfo chatInfoToPut = new ChatMetaInfo(chatId);
+        return Optional
+                .ofNullable(chatsInfo
+                        .putIfAbsent(chatId, chatInfoToPut)
+                )
+                .orElse(chatInfoToPut);
+    }
+
+    private Long retrieveChatId(@NonNull Message message) {
+        return message.getChatId();
     }
 }

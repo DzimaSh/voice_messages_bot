@@ -13,8 +13,9 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import static by.bsu.voicemessages.util.TelegramUtil.buildKeyboardButton;
-import static by.bsu.voicemessages.util.TelegramUtil.buildReplyMarkupMessage;
+import static by.bsu.voicemessages.bot.util.BotActionConstants.CALLBACK_DATA_SEPARATOR;
+import static by.bsu.voicemessages.bot.util.BotActionConstants.SET_LANG_CALLBACK_KEY;
+import static by.bsu.voicemessages.util.TelegramUtil.*;
 
 @Slf4j
 public class SetLangCommand extends Command {
@@ -50,8 +51,8 @@ public class SetLangCommand extends Command {
     private List<InlineKeyboardButton> prepareAllLangButtons() {
         return Arrays.stream(Language.values())
                 .map(lang -> buildKeyboardButton(
-                        lang.getDescription() + " " + lang.getEmojiCode(),
-                        String.valueOf(lang)
+                        concatStringsWithSeparator(" ", lang.getDescription(), lang.getEmojiCode()),
+                        concatStringsWithSeparator(CALLBACK_DATA_SEPARATOR, SET_LANG_CALLBACK_KEY, String.valueOf(lang))
                 ))
                 .toList();
     }

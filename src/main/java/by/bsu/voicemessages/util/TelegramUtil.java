@@ -6,6 +6,7 @@ import com.vdurmont.emoji.EmojiParser;
 import lombok.extern.slf4j.Slf4j;
 import org.telegram.telegrambots.meta.api.methods.GetFile;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
+import org.telegram.telegrambots.meta.api.methods.updatingmessages.EditMessageText;
 import org.telegram.telegrambots.meta.api.objects.File;
 import org.telegram.telegrambots.meta.api.objects.Voice;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.ReplyKeyboard;
@@ -18,10 +19,27 @@ import java.util.List;
 
 @Slf4j
 public class TelegramUtil {
+    private final static String ANSWER_SENT = "Answer sent to user";
+
+    public static void updateMessage(AbsSender sender, EditMessageText editedMessage) throws TelegramApiException {
+        sender.execute(editedMessage);
+        log.info(ANSWER_SENT);
+    }
 
     public static void sendMessage(AbsSender sender, SendMessage message) throws TelegramApiException {
         sender.execute(message);
-        log.info("Answer sent to user");
+        log.info(ANSWER_SENT);
+    }
+
+    public static EditMessageText buildEditMessage(String newText, Integer messageId, Long chatId) {
+        EditMessageText editedMessage = EditMessageText.builder()
+                .chatId(chatId)
+                .messageId(messageId)
+                .text(newText)
+                .build();
+
+        editedMessage.enableMarkdown(true);
+        return editedMessage;
     }
 
     public static SendMessage buildMessage(String text, Long chatId) {
@@ -115,4 +133,16 @@ public class TelegramUtil {
                 .callbackData(callbackData)
                 .build();
     }
+
+    public static String concatStringsWithSeparator(String separator, String... strings) {
+        StringBuilder sb = new StringBuilder();
+        for (int i = 0; i < strings.length; i++) {
+            sb.append(strings[i]);
+            if (i < strings.length - 1) {
+                sb.append(separator);
+            }
+        }
+        return sb.toString();
+    }
+
 }

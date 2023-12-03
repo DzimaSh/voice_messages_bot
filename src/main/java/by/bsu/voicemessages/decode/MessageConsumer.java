@@ -111,7 +111,7 @@ public class MessageConsumer implements Runnable {
                 decoderProperties.getDecoderModel(),
                 voiceFileLocation,
                 "--encode",
-                !lang.equals(Language.RECOGNIZE) ? String.format("--language=%s", Language.BE.getLang()) : ""
+                !lang.equals(Language.RECOGNIZE) ? String.format("--language=%s", lang.getLang()) : ""
         );
         processBuilder.redirectErrorStream(true);
 
