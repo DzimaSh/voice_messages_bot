@@ -1,3 +1,4 @@
+import argparse
 import os
 import whisper
 import sys
@@ -30,16 +31,26 @@ def validate_input_params(model_name, voice_file_path, language, encode):
         raise ValueError("voice_file_path must be a valid file path")
 
 
-if __name__ == "__main__":
-    args = len(sys.argv)
-    if args < 3 or args > 5:
-        print("Usage: python script.py <model_name> <voice_file_path> [language] [encode_flag]")
-        sys.exit(1)
+def parse_arguments():
+    parser = argparse.ArgumentParser(description="Decode audio file.")
+    parser.add_argument("model_name", help="Name of the model.")
+    parser.add_argument("voice_file_path", help="Path to the voice file.")
+    parser.add_argument("--language", default=None, metavar="LANGUAGE",
+                        help="Language to use for decoding.")
+    parser.add_argument("--encode", default=False, action=argparse.BooleanOptionalAction,
+                        help="Whether to encode the output.")
 
-    model_name = sys.argv[1]
-    voice_file_path = sys.argv[2]
-    language = None if len(sys.argv) < 4 else sys.argv[3]
-    encode = False if len(sys.argv) < 5 else sys.argv[4].lower() == 'true'
+    return parser.parse_args()
+
+
+if __name__ == "__main__":
+    args = parse_arguments()
+
+    # Unwrap the args
+    model_name = args.model_name
+    voice_file_path = args.voice_file_path
+    language = args.language
+    encode = args.encode
 
     # Validate the input parameters
     validate_input_params(model_name, voice_file_path, language, encode)
