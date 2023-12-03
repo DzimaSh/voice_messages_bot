@@ -2,7 +2,7 @@
 
 # Check if both arguments are provided
 if [ "$#" -lt 3 ]; then
-    echo "Usage: ./decode.sh <decoder_file_name> <model_name> <voice_file_path> [--language=LANGUAGE] [--encode | --no-encode]"
+    echo "Usage: ./decode.sh <decoder_file_name> <model_name> <voice_file_path>  [--encode | --no-encode] [--language=LANGUAGE]"
     exit 1
 fi
 

@@ -35,8 +35,8 @@ public class MessageConsumer implements Runnable {
         while (true) {
             if (isWritingAudio.get()) continue;
             try {
-                VoiceMessageInfo retrievedPair = files.take();
-                File fileToDecode = retrievedPair.getFile();
+                VoiceMessageInfo messageInfo = files.take();
+                File fileToDecode = messageInfo.getFile();
 
                 isWritingAudio.compareAndSet(false, true);
                 log.debug("Taking message... " + files.size() + " still waiting.");
@@ -47,15 +47,16 @@ public class MessageConsumer implements Runnable {
                 saveVoiceFile(fileUrl, voiceFfileLocation);
                 isWritingAudio.compareAndSet(true, false);
 
-                String decodedMessage = decodeMessage(voiceFfileLocation);
+                String decodedMessage = decodeMessage(voiceFfileLocation, messageInfo.getLang());
                 bot.execute(
                         buildReplyMessage(decodedMessage,
-                                retrievedPair.getChatId(),
-                                retrievedPair.getMessageId()
+                                messageInfo.getChatId(),
+                                messageInfo.getMessageId()
                         )
                 );
             } catch (InterruptedException | IOException | TelegramApiException e) {
                 log.error("Error occurred while handling decoding voice message");
+                e.printStackTrace();
             }
         }
     }
@@ -80,16 +81,16 @@ public class MessageConsumer implements Runnable {
         }
     }
 
-    private String decodeMessage(String voiceFileLocation) throws IOException, InterruptedException {
-        Process process = buildDecodeProcess(voiceFileLocation);
+    private String decodeMessage(String voiceFileLocation, Language lang) throws IOException, InterruptedException {
+        Process process = buildDecodeProcess(voiceFileLocation, lang);
         BufferedReader reader = new BufferedReader(
                 new InputStreamReader(process.getInputStream(), StandardCharsets.UTF_8)
         );
 
         StringBuilder builder = new StringBuilder();
-        String utf8encoded;
-        while ((utf8encoded = reader.readLine()) != null) {
-            builder.append(decodeUnicodeString(utf8encoded)).append('\n');
+        String unicodeEncoded;
+        while ((unicodeEncoded = reader.readLine()) != null) {
+            builder.append(decodeUnicodeString(unicodeEncoded)).append('\n');
         }
 
         int exitCode = process.waitFor();
@@ -104,13 +105,14 @@ public class MessageConsumer implements Runnable {
     }
 
     @NotNull
-    private Process buildDecodeProcess(String voiceFileLocation) throws IOException {
+    private Process buildDecodeProcess(String voiceFileLocation, Language lang) throws IOException {
         ProcessBuilder processBuilder = new ProcessBuilder(
                 decoderProperties.getDecodeScript(),
                 decoderProperties.getDecoderFile(),
                 decoderProperties.getDecoderModel(),
                 voiceFileLocation,
-                "--encode"
+                "--encode",
+                !lang.equals(Language.RECOGNIZE) ? String.format("--language=%s", Language.BE.getLang()) : ""
         );
         processBuilder.redirectErrorStream(true);
 

@@ -1,7 +1,6 @@
 import argparse
 import os
 import whisper
-import sys
 
 
 def encode_to_unicode(input_string):
